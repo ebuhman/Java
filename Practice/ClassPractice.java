@@ -1,4 +1,4 @@
-package Java_Sprint.Practice;
+package Practice;
 
 public class ClassPractice {
     
