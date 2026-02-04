@@ -30,7 +30,7 @@ public abstract class GameCharacter {
 
     public void takeDamage(int incomingDamage)
     {
-        health -= Math.max(0, incomingDamage - attackPower);
+        health -= Math.max(0, incomingDamage - defense);
     }
 
     public boolean isAlive()

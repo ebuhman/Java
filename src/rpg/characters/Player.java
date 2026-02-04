@@ -7,11 +7,12 @@ public class Player extends GameCharacter {
     protected int gold;
     protected int enemiesDefeated;
 
-    public Player(String name, int health, int maxHealth, int defense, int attackPower)
+    public Player(String name, int health, int maxHealth, int attackPower, int defense)
     {
         super(name, health, maxHealth, attackPower, defense);
     }
 
+    @Override
     public int attack()
     {
         return GetAttackPower();

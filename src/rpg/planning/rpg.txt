@@ -1,0 +1,239 @@
+============================================================
+         TEXT-BASED RPG  —  UML CLASS DIAGRAM
+============================================================
+
+------------------------------------------------------------
+                      <<abstract>>
+                       Character
+------------------------------------------------------------
+  - name          : String
+  - health        : int
+  - maxHealth     : int
+  - attackPower   : int
+  - defense       : int
+------------------------------------------------------------
+  + getName()           : String
+  + getHealth()         : int
+  + takeDamage(int)     : void
+  + isAlive()           : boolean
+  + abstract attack()   : int
+------------------------------------------------------------
+
+
+============================================================
+  INHERITANCE  (extends Character)
+============================================================
+
+        Character
+            |
+     -------+-------
+     |             |
+   Player        Enemy  (abstract)
+
+
+------------------------------------------------------------
+                       Player
+------------------------------------------------------------
+  - inventory       : List<HealingItem>
+  - gold            : int
+  - enemiesDefeated : int
+------------------------------------------------------------
+  + attack()            : int
+  + defend()            : void
+  + useItem(HealingItem): void
+  + addItem(HealingItem): void
+  + endTurn()           : void
+------------------------------------------------------------
+  Notes:
+    - Choosing attack(), defend(), or useItem() each
+      ends the player's turn.
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+                      <<abstract>>
+                        Enemy
+------------------------------------------------------------
+  - xpReward      : int
+  - goldReward    : int
+  - dropChance    : float         // base 0.30 (30%)
+------------------------------------------------------------
+  + attack()                : int
+  + rollDrop()              : HealingItem  // returns null if roll fails
+  + abstract canCharge()    : boolean
+------------------------------------------------------------
+  Notes:
+    - rollDrop() generates a random value 0–1. If the
+      value is <= dropChance, a HealingItem is returned.
+      Otherwise returns null. All subclasses inherit this.
+------------------------------------------------------------
+
+
+============================================================
+  INHERITANCE  (extends Enemy)
+============================================================
+
+            Enemy
+              |
+     ---------+---------
+     |        |        |
+BasicEnemy  ChargedEnemy  MiniBoss
+
+
+------------------------------------------------------------
+                     BasicEnemy
+------------------------------------------------------------
+  - enemyType     : EnemyType
+------------------------------------------------------------
+  + attack()            : int
+  + canCharge()         : boolean     // always false
+------------------------------------------------------------
+  Notes:
+    - Cannot perform charged attacks.
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+                    ChargedEnemy
+------------------------------------------------------------
+  - enemyType     : EnemyType
+  - chargeChance  : float
+  - isCharging    : boolean
+------------------------------------------------------------
+  + attack()                : int
+  + canCharge()             : boolean   // always true
+  + attemptCharge()         : boolean
+  + displayChargeWarning()  : void
+------------------------------------------------------------
+  Notes:
+    - Each turn has a random chance (chargeChance) to
+      enter a charging state.
+    - When charging, displayChargeWarning() prints a
+      message so the player can defend on their next turn.
+    - The charged attack fires on the following enemy turn.
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+                      MiniBoss
+------------------------------------------------------------
+  - phase         : int
+  - chargeChance  : float
+  - isCharging    : boolean
+------------------------------------------------------------
+  + attack()                : int
+  + canCharge()             : boolean   // always true
+  + attemptCharge()         : boolean
+  + displayChargeWarning()  : void
+  + phaseTransition()       : void
+------------------------------------------------------------
+  Notes:
+    - Spawned by EnemySpawner after a set number of
+      enemy encounters.
+    - Capable of charged attacks (same mechanic as
+      ChargedEnemy).
+    - phaseTransition() can escalate stats or behavior
+      mid-fight.
+------------------------------------------------------------
+
+
+============================================================
+  STANDALONE CLASSES
+============================================================
+
+------------------------------------------------------------
+                    HealingItem
+------------------------------------------------------------
+  - name          : String
+  - description   : String
+  - healAmount    : int
+------------------------------------------------------------
+  + use(Player)         : void
+  + getHealAmount()     : int
+  + getName()           : String
+  + getDescription()    : String
+------------------------------------------------------------
+  Notes:
+    - Consumed from the player's inventory on use.
+    - Using a HealingItem ends the player's turn.
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+                    EnemySpawner
+------------------------------------------------------------
+  - enemyPool     : List<Class<Enemy>>
+  - spawnCount    : int
+  - bossTrigger   : int
+------------------------------------------------------------
+  + spawnEnemy()        : Enemy
+  + checkBossTrigger()  : boolean
+  + setBossTrigger(int) : void
+------------------------------------------------------------
+  Notes:
+    - spawnEnemy() picks a random enemy type from the
+      pool each time it is called.
+    - spawnCount increments on each spawn. Once it
+      reaches bossTrigger, checkBossTrigger() returns
+      true and a MiniBoss is spawned instead.
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+                    BattleManager
+------------------------------------------------------------
+  - player        : Player
+  - currentEnemy  : Enemy
+  - spawner       : EnemySpawner
+  - turnActive    : boolean
+------------------------------------------------------------
+  + startBattle()       : void
+  + playerTurn()        : void
+  + enemyTurn()         : void
+  + endTurn()           : void
+  + checkVictory()      : boolean
+  + awardDrops()        : void
+------------------------------------------------------------
+  Notes:
+    - Orchestrates the combat loop. The player acts once
+      (attack / defend / use item), then the enemy acts.
+    - awardDrops() calls the enemy's rollDrop() on
+      victory and adds the result to the player's
+      inventory if the roll succeeds.
+------------------------------------------------------------
+
+
+============================================================
+  ENUM
+============================================================
+
+------------------------------------------------------------
+                      <<enum>>
+                     EnemyType
+------------------------------------------------------------
+  GOBLIN
+  SKELETON
+  WOLF
+  SHADOW_CREEPER
+  CAVE_TROLL
+------------------------------------------------------------
+
+
+============================================================
+  RELATIONSHIP SUMMARY
+============================================================
+
+  Player          ──extends──>  Character
+  Enemy           ──extends──>  Character
+  BasicEnemy      ──extends──>  Enemy
+  ChargedEnemy    ──extends──>  Enemy
+  MiniBoss        ──extends──>  Enemy
+  Player          ──has 0..*──> HealingItem
+  Enemy           ──returns 0..1──> HealingItem   (via rollDrop)
+  EnemySpawner    ──creates──>  Enemy / MiniBoss
+  BattleManager   ──has 1──>    Player
+  BattleManager   ──has 1──>    Enemy
+  BattleManager   ──has 1──>    EnemySpawner
+  BasicEnemy      ──has 1──>    EnemyType
+  ChargedEnemy    ──has 1──>    EnemyType
+============================================================
