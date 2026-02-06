@@ -10,6 +10,7 @@ import rpg.characters.Player;
 import rpg.characters.Enemy;
 import rpg.characters.MiniBoss;
 import rpg.EnemySpawner;
+import rpg.BattleManager;
 
 public class GameTest {
     
@@ -18,13 +19,13 @@ public class GameTest {
         Player player1 = new Player("Hero", 100, 100, 15, 10);
         Player player2 = new Player("Warrior", 120, 120, 20, 5);
         
-        assertEquals("Hero", player1.GetName());
-        assertEquals(100, player1.GetHealth());
-        assertEquals(15, player1.GetAttackPower());
+        assertEquals("Hero", player1.getName());
+        assertEquals(100, player1.getHealth());
+        assertEquals(15, player1.getAttackPower());
         
-        assertEquals("Warrior", player2.GetName());
-        assertEquals(120, player2.GetHealth());
-        assertEquals(20, player2.GetAttackPower());
+        assertEquals("Warrior", player2.getName());
+        assertEquals(120, player2.getHealth());
+        assertEquals(20, player2.getAttackPower());
     }
     
     @Test
@@ -33,11 +34,11 @@ public class GameTest {
         
         // Player has 10 defense, so 30 damage - 10 defense = 20 actual damage
         player.takeDamage(30);
-        assertEquals(80, player.GetHealth());
+        assertEquals(80, player.getHealth());
         
         // Take more damage
         player.takeDamage(25);
-        assertEquals(65, player.GetHealth());
+        assertEquals(65, player.getHealth());
     }
     
     @Test
@@ -46,12 +47,12 @@ public class GameTest {
         
         // Damage the player first
         player.takeDamage(40);
-        assertEquals(70, player.GetHealth());
+        assertEquals(70, player.getHealth());
         
         // Heal with a potion
         HealingItem potion = new HealingItem("Health Potion", "Restores 20 HP", 20);
         potion.use(player);
-        assertEquals(90, player.GetHealth());
+        assertEquals(90, player.getHealth());
     }
     
     @Test
@@ -60,12 +61,12 @@ public class GameTest {
         
         // Only take 10 damage
         player.takeDamage(20);
-        assertEquals(90, player.GetHealth());
+        assertEquals(90, player.getHealth());
         
         // Try to heal 50 HP (should cap at 100)
         HealingItem bigPotion = new HealingItem("Mega Potion", "Restores 50 HP", 50);
         bigPotion.use(player);
-        assertEquals(100, player.GetHealth());
+        assertEquals(100, player.getHealth());
     }
     
     @Test
@@ -87,13 +88,13 @@ public class GameTest {
         Enemy goblin = new Enemy("Goblin", 30, 30, 8, 2, EnemyType.GOBLIN);
         Enemy skeleton = new Enemy("Skeleton", 25, 25, 10, 1, EnemyType.SKELETON);
         
-        assertEquals("Goblin", goblin.GetName());
-        assertEquals(30, goblin.GetHealth());
-        assertEquals(8, goblin.GetAttackPower());
+        assertEquals("Goblin", goblin.getName());
+        assertEquals(30, goblin.getHealth());
+        assertEquals(8, goblin.getAttackPower());
         assertEquals(EnemyType.GOBLIN, goblin.getEnemyType());
         
-        assertEquals("Skeleton", skeleton.GetName());
-        assertEquals(25, skeleton.GetHealth());
+        assertEquals("Skeleton", skeleton.getName());
+        assertEquals(25, skeleton.getHealth());
         assertEquals(EnemyType.SKELETON, skeleton.getEnemyType());
     }
 
@@ -110,7 +111,7 @@ public class GameTest {
         Enemy goblin = new Enemy("Goblin", 30, 30, 8, 2, EnemyType.GOBLIN);
         
         goblin.takeDamage(15);
-        assertEquals(17, goblin.GetHealth());  // 30 - (15 - 2 defense) = 17
+        assertEquals(17, goblin.getHealth());  // 30 - (15 - 2 defense) = 17
         
         assertTrue(goblin.isAlive());
         
@@ -137,9 +138,9 @@ public class GameTest {
     public void testMiniBossCreation() {
         MiniBoss boss = new MiniBoss("Shadow Lord", 100, 100, 20, 5);
         
-        assertEquals("Shadow Lord", boss.GetName());
-        assertEquals(100, boss.GetHealth());
-        assertEquals(20, boss.GetAttackPower());
+        assertEquals("Shadow Lord", boss.getName());
+        assertEquals(100, boss.getHealth());
+        assertEquals(20, boss.getAttackPower());
         assertEquals(1, boss.getPhase());  // Starts in phase 1
     }
 
@@ -169,7 +170,7 @@ public class GameTest {
         
         // Stats should be boosted (adjust based on your actual boosts)
         assertEquals(110, boss.getMaxHealth());  // If you added +20
-        assertTrue(boss.GetAttackPower() > 20);   // Should be boosted
+        assertTrue(boss.getAttackPower() > 20);   // Should be boosted
     }
 
     @Test
@@ -180,12 +181,12 @@ public class GameTest {
         boss.takeDamage(60);
         boss.checkPhaseTransition();
         
-        int attackAfterFirstTransition = boss.GetAttackPower();
+        int attackAfterFirstTransition = boss.getAttackPower();
         
         // Call transition again - stats shouldn't increase again
         boss.checkPhaseTransition();
         
-        assertEquals(attackAfterFirstTransition, boss.GetAttackPower());
+        assertEquals(attackAfterFirstTransition, boss.getAttackPower());
         assertEquals(2, boss.getPhase());  // Still phase 2, not phase 3
     }
 
@@ -199,7 +200,7 @@ public class GameTest {
         
         // Should still be in phase 1
         assertEquals(1, boss.getPhase());
-        assertEquals(20, boss.GetAttackPower());  // Stats unchanged
+        assertEquals(20, boss.getAttackPower());  // Stats unchanged
     }
 
     @Test

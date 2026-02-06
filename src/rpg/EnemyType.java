@@ -3,5 +3,6 @@ package rpg;
 public enum  EnemyType {
     GOBLIN,
     SKELETON,
-    SLIME
+    SLIME,
+    BOSS
 }

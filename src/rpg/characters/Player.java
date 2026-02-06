@@ -14,12 +14,27 @@ public class Player extends GameCharacter {
     @Override
     public int attack()
     {
-        return GetAttackPower();
+        return getAttackPower();
     }
 
-    public void useItem()
+    public void useItem(int slot)
     {
+        if (slot >= 0 && slot < 3 && inventory[slot] != null)
+        {
+            inventory[slot].use(this);
+            System.out.println("Used" + inventory[slot].getName() + "!");
+            inventory[slot] = null;
+        }
+        else 
+        {
+            System.out.println("You have nothing in your inventory!");
+        }
+        
+    }
 
+    public HealingItem[] getInventory()
+    {
+        return inventory;
     }
 
     public boolean addItem(HealingItem item)

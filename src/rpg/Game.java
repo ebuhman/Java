@@ -1,21 +1,51 @@
 package rpg;
-import rpg.characters.*;
+import java.util.Scanner;
+import rpg.characters.Player;
 
 public class Game {
     public static void main(String[] args) {
-        Player testCharacter = new Player("TestGuy", 100, 100, 15, 10);
-        
-        System.out.println(testCharacter.GetName());
-        System.out.println("Health: " + testCharacter.GetHealth());
-        
-        // Damage the player
-        testCharacter.takeDamage(30);
-        System.out.println("Health after damage: " + testCharacter.GetHealth());
-        
-        // Create and use a healing item
-        HealingItem potion = new HealingItem("Health Potion", "Restores 20 HP", 20);
-        potion.use(testCharacter);
-        System.out.println("Health after potion: " + testCharacter.GetHealth());
-    }   
-}
+        Scanner input = new Scanner(System.in);
 
+        // 1. Setup the Player
+        System.out.println("--- Welcome to the Java RPG ---");
+        System.out.print("Enter your hero's name: ");
+        String name = input.nextLine();
+        
+        // Initializing hero with Health, MaxHealth, Attack, and Defense
+        Player hero = new Player(name, 100, 100, 15, 2);
+        BattleManager battleManager = new BattleManager(hero, 7);
+
+        boolean gameRunning = true;
+
+        // 2. The Main Game Loop
+        while (gameRunning && hero.isAlive()) {
+            System.out.println("\n================================");
+            System.out.println("You wander into the tall grass...");
+            
+            // Triggers the battle logic in BattleManager
+            battleManager.runBattle(); 
+
+            // 3. Post-Battle Menu
+            if (hero.isAlive()) {
+                System.out.println("\n1. Continue adventuring");
+                System.out.println("2. Retire (Quit Game)");
+                System.out.print("Choice: ");
+                
+                // Handling user input to either continue or stop
+                if (input.hasNextInt()) {
+                    int choice = input.nextInt();
+                    input.nextLine(); // Clear scanner buffer
+                    
+                    if (choice == 2) {
+                        gameRunning = false; 
+                        System.out.println("You retired a valiant hero!");
+                    }
+                }
+            } else {
+                System.out.println("GAME OVER. Better luck next time!");
+                gameRunning = false;
+            }
+        }
+        input.close();
+    }
+}

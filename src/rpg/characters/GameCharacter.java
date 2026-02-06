@@ -18,12 +18,17 @@ public abstract class GameCharacter {
     }
 
     // Methods
-    public String GetName()
+    public String getName()
     {
         return name;
     }
 
-    public int GetHealth()
+    public int getDefense()
+    {
+        return defense;
+    }
+
+    public int getHealth()
     {
         return health;
     }
@@ -38,7 +43,7 @@ public abstract class GameCharacter {
         return health > 0;
     }
 
-    public int GetAttackPower()
+    public int getAttackPower()
     {
         return attackPower;
     }
@@ -48,7 +53,7 @@ public abstract class GameCharacter {
         return maxHealth;
     }
 
-    public void SetHealth(int newHealth)
+    public void setHealth(int newHealth)
     {
         health = newHealth;
     }

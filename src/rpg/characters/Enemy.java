@@ -16,7 +16,7 @@ public class Enemy extends GameCharacter {
     @Override
     public int attack()
     {
-        return GetAttackPower();
+        return getAttackPower();
     }
 
     public HealingItem rollDrop()
