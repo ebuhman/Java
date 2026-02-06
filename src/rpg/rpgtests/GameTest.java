@@ -3,11 +3,13 @@ package rpg;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import rpg.EnemySpawner;
 import rpg.EnemyType;
 import rpg.HealingItem;
 import rpg.characters.Player;
 import rpg.characters.Enemy;
 import rpg.characters.MiniBoss;
+import rpg.EnemySpawner;
 
 public class GameTest {
     
@@ -198,5 +200,107 @@ public class GameTest {
         // Should still be in phase 1
         assertEquals(1, boss.getPhase());
         assertEquals(20, boss.GetAttackPower());  // Stats unchanged
+    }
+
+    @Test
+    public void testEnemySpawnerCreation() {
+        EnemySpawner spawner = new EnemySpawner(5);
+        
+        // Should not spawn boss initially
+        assertFalse(spawner.shouldSpawnBoss());
+    }
+
+    @Test
+    public void testSpawnEnemy() {
+        EnemySpawner spawner = new EnemySpawner(5);
+        
+        Enemy enemy = spawner.spawnEnemy();
+        
+        // Enemy should be created
+        assertNotNull(enemy);
+        assertTrue(enemy.isAlive());
+        
+        // Should be one of the three types
+        EnemyType type = enemy.getEnemyType();
+        assertTrue(type == EnemyType.GOBLIN || 
+                type == EnemyType.SKELETON || 
+                type == EnemyType.SLIME);
+    }
+
+    @Test
+    public void testSpawnMultipleEnemies() {
+        EnemySpawner spawner = new EnemySpawner(5);
+        
+        // Spawn 3 enemies
+        Enemy enemy1 = spawner.spawnEnemy();
+        Enemy enemy2 = spawner.spawnEnemy();
+        Enemy enemy3 = spawner.spawnEnemy();
+        
+        // All should be valid enemies
+        assertNotNull(enemy1);
+        assertNotNull(enemy2);
+        assertNotNull(enemy3);
+    }
+
+    @Test
+    public void testBossTrigger() {
+        EnemySpawner spawner = new EnemySpawner(3);  // Boss after 3 enemies
+        
+        // No boss initially
+        assertFalse(spawner.shouldSpawnBoss());
+        
+        // Spawn 3 enemies
+        spawner.spawnEnemy();
+        assertFalse(spawner.shouldSpawnBoss());  // Not yet
+        
+        spawner.spawnEnemy();
+        assertFalse(spawner.shouldSpawnBoss());  // Not yet
+        
+        spawner.spawnEnemy();
+        assertTrue(spawner.shouldSpawnBoss());   // Now boss should spawn!
+    }
+
+    @Test
+    public void testResetCount() {
+        EnemySpawner spawner = new EnemySpawner(3);
+        
+        // Spawn 3 enemies to trigger boss
+        spawner.spawnEnemy();
+        spawner.spawnEnemy();
+        spawner.spawnEnemy();
+        
+        assertTrue(spawner.shouldSpawnBoss());
+        
+        // Reset the counter (after boss is defeated)
+        spawner.resetCount();
+        
+        // Boss should not spawn anymore
+        assertFalse(spawner.shouldSpawnBoss());
+    }
+
+    @Test
+    public void testEnemyTypeVariety() {
+        EnemySpawner spawner = new EnemySpawner(100);
+        
+        boolean foundGoblin = false;
+        boolean foundSkeleton = false;
+        boolean foundSlime = false;
+        
+        // Spawn 20 enemies and check we get variety
+        for (int i = 0; i < 20; i++) {
+            Enemy enemy = spawner.spawnEnemy();
+            EnemyType type = enemy.getEnemyType();
+            
+            if (type == EnemyType.GOBLIN) foundGoblin = true;
+            if (type == EnemyType.SKELETON) foundSkeleton = true;
+            if (type == EnemyType.SLIME) foundSlime = true;
+        }
+        
+        // With 20 spawns, we should see at least 2 of the 3 types
+        // (statistically very likely)
+        int typesFound = (foundGoblin ? 1 : 0) + 
+                        (foundSkeleton ? 1 : 0) + 
+                        (foundSlime ? 1 : 0);
+        assertTrue(typesFound >= 2);
     }
 }
