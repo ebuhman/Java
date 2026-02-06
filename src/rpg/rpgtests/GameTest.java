@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import rpg.HealingItem;
 import rpg.characters.Player;
+import rpg.characters.Enemy;
 
 public class GameTest {
     
@@ -76,5 +77,56 @@ public class GameTest {
         // Take lethal damage
         player.takeDamage(100);
         assertFalse(player.isAlive());
+    }
+    @Test
+    public void testEnemyCreation() {
+        Enemy goblin = new Enemy("Goblin", 30, 30, 8, 2, EnemyType.GOBLIN);
+        Enemy skeleton = new Enemy("Skeleton", 25, 25, 10, 1, EnemyType.SKELETON);
+        
+        assertEquals("Goblin", goblin.GetName());
+        assertEquals(30, goblin.GetHealth());
+        assertEquals(8, goblin.GetAttackPower());
+        assertEquals(EnemyType.GOBLIN, goblin.getEnemyType());
+        
+        assertEquals("Skeleton", skeleton.GetName());
+        assertEquals(25, skeleton.GetHealth());
+        assertEquals(EnemyType.SKELETON, skeleton.getEnemyType());
+    }
+
+    @Test
+    public void testEnemyAttack() {
+        Enemy goblin = new Enemy("Goblin", 30, 30, 8, 2, EnemyType.GOBLIN);
+        
+        int damage = goblin.attack();
+        assertEquals(8, damage);  // Should return attackPower
+    }   
+
+    @Test
+    public void testEnemyTakesDamage() {
+        Enemy goblin = new Enemy("Goblin", 30, 30, 8, 2, EnemyType.GOBLIN);
+        
+        goblin.takeDamage(15);
+        assertEquals(17, goblin.GetHealth());  // 30 - (15 - 2 defense) = 17
+        
+        assertTrue(goblin.isAlive());
+        
+        goblin.takeDamage(50);
+        assertFalse(goblin.isAlive());
+    }
+
+    @Test
+    public void testEnemyDrops() {
+        Enemy goblin = new Enemy("Goblin", 30, 30, 8, 2, EnemyType.GOBLIN);
+        
+        // This test is probabilistic - rollDrop might return null or an item
+        // We'll just verify it doesn't crash and returns the right type
+        HealingItem drop = goblin.rollDrop();
+        
+        // drop can be null or a HealingItem, both are valid
+        if (drop != null) {
+            assertEquals("Health Potion", drop.getName());
+            assertEquals(20, drop.getHealAmount());
+        }
+        // If null, the 30% chance failed - that's okay
     }
 }
