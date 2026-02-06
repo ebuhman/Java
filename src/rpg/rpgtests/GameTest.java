@@ -3,9 +3,11 @@ package rpg;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import rpg.EnemyType;
 import rpg.HealingItem;
 import rpg.characters.Player;
 import rpg.characters.Enemy;
+import rpg.characters.MiniBoss;
 
 public class GameTest {
     
@@ -128,5 +130,73 @@ public class GameTest {
             assertEquals(20, drop.getHealAmount());
         }
         // If null, the 30% chance failed - that's okay
+    }
+    @Test
+    public void testMiniBossCreation() {
+        MiniBoss boss = new MiniBoss("Shadow Lord", 100, 100, 20, 5);
+        
+        assertEquals("Shadow Lord", boss.GetName());
+        assertEquals(100, boss.GetHealth());
+        assertEquals(20, boss.GetAttackPower());
+        assertEquals(1, boss.getPhase());  // Starts in phase 1
+    }
+
+    @Test
+    public void testMiniBossAttack() {
+        MiniBoss boss = new MiniBoss("Shadow Lord", 100, 100, 20, 5);
+        
+        int damage = boss.attack();
+        assertEquals(20, damage);
+    }
+
+    @Test
+    public void testMiniBossPhaseTransition() {
+        MiniBoss boss = new MiniBoss("Shadow Lord", 100, 100, 20, 5);
+        
+        // Boss is at full health, phase should be 1
+        assertEquals(1, boss.getPhase());
+        
+        // Damage boss to below 50% HP (51+ damage)
+        boss.takeDamage(60);
+        
+        // Check for phase transition
+        boss.checkPhaseTransition();
+        
+        // Should now be in phase 2
+        assertEquals(2, boss.getPhase());
+        
+        // Stats should be boosted (adjust based on your actual boosts)
+        assertEquals(110, boss.getMaxHealth());  // If you added +20
+        assertTrue(boss.GetAttackPower() > 20);   // Should be boosted
+    }
+
+    @Test
+    public void testMiniBossPhaseTransitionOnlyOnce() {
+        MiniBoss boss = new MiniBoss("Shadow Lord", 100, 100, 20, 5);
+        
+        // Damage to trigger phase 2
+        boss.takeDamage(60);
+        boss.checkPhaseTransition();
+        
+        int attackAfterFirstTransition = boss.GetAttackPower();
+        
+        // Call transition again - stats shouldn't increase again
+        boss.checkPhaseTransition();
+        
+        assertEquals(attackAfterFirstTransition, boss.GetAttackPower());
+        assertEquals(2, boss.getPhase());  // Still phase 2, not phase 3
+    }
+
+    @Test
+    public void testMiniBossDoesNotTransitionEarly() {
+        MiniBoss boss = new MiniBoss("Shadow Lord", 100, 100, 20, 5);
+        
+        // Take only 30 damage (still above 50% HP)
+        boss.takeDamage(30);
+        boss.checkPhaseTransition();
+        
+        // Should still be in phase 1
+        assertEquals(1, boss.getPhase());
+        assertEquals(20, boss.GetAttackPower());  // Stats unchanged
     }
 }

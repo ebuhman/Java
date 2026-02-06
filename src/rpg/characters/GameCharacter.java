@@ -43,6 +43,11 @@ public abstract class GameCharacter {
         return attackPower;
     }
 
+    public int getMaxHealth()
+    {
+        return maxHealth;
+    }
+
     public void SetHealth(int newHealth)
     {
         health = newHealth;
